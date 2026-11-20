@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yang 的主页</title>
+<meta name="description" content="Yang — 设计爱好者 · AI 爱好者 · App 开发者">
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: rgba(255,255,255,.78);
+    --text: #1b1b1f;
+    --muted: #6b6b75;
+    --line: rgba(0,0,0,.08);
+    --accent: #5b5bf0;
+    --accent-2: #e0559c;
+    --overlay: rgba(247,246,243,.72);
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111114;
+      --surface: rgba(28,28,34,.78);
+      --text: #ececf1;
+      --muted: #9a9aa6;
+      --line: rgba(255,255,255,.09);
+      --accent: #8b8bff;
+      --accent-2: #ff7ab8;
+      --overlay: rgba(17,17,20,.68);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  /* Background photo layer */
+  #bg {
+    position: fixed; inset: 0; z-index: -2;
+    background-size: cover; background-position: center;
+    transition: opacity .5s;
+  }
+  #bg::after { content: ""; position: absolute; inset: 0; background: var(--overlay); backdrop-filter: blur(2px); }
+  body:not(.has-bg) #bg { opacity: 0; }
+  /* Default soft gradient glow */
+  .glow {
+    position: fixed; z-index: -3; width: 60vmax; height: 60vmax; border-radius: 50%;
+    filter: blur(90px); opacity: .22; pointer-events: none;
+  }
+  .glow.a { background: var(--accent); top: -25vmax; left: -15vmax; }
+  .glow.b { background: var(--accent-2); bottom: -30vmax; right: -20vmax; }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* Top bar */
+  header.bar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; max-width: 960px; margin: 0 auto;
+  }
+  .logo { font-weight: 700; letter-spacing: .02em; }
+  .tools { display: flex; gap: 8px; }
+  .btn {
+    font: inherit; font-size: 13px; color: var(--text); cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: transform .15s, border-color .15s;
+  }
+  .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .btn[hidden] { display: none; }
+
+  /* Hero */
+  .hero { padding: 72px 0 56px; text-align: center; }
+  .avatar {
+    width: 96px; height: 96px; margin: 0 auto 24px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 40px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 10px 30px rgba(91,91,240,.35);
+  }
+  h1 { font-size: clamp(36px, 7vw, 56px); line-height: 1.1; letter-spacing: -.02em; }
+  h1 .grad {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tagline { margin-top: 14px; color: var(--muted); font-size: 17px; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px; }
+  .chip {
+    font-size: 13px; padding: 4px 12px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+
+  section { padding: 32px 0; }
+  h2 { font-size: 22px; margin-bottom: 18px; letter-spacing: -.01em; }
+  h2 small { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 8px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px; box-shadow: var(--shadow);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .about p + p { margin-top: 10px; }
+
+  /* Projects */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .proj { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; transition: transform .2s, border-color .2s; }
+  .proj:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .proj-top { display: flex; align-items: center; gap: 12px; }
+  .icon {
+    width: 44px; height: 44px; border-radius: 12px; flex: none;
+    display: grid; place-items: center; font-size: 22px; color: #fff;
+  }
+  .proj h3 { font-size: 17px; }
+  .status { font-size: 12px; color: var(--muted); }
+  .status::before { content: "●"; margin-right: 4px; color: var(--dot, #f0a020); }
+  .proj p { color: var(--muted); font-size: 14px; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; padding: 2px 8px; border-radius: 6px; background: var(--line); }
+
+  /* Contact */
+  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .links a { text-decoration: none; }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0 48px; }
+
+  @media (max-width: 520px) {
+    .hero { padding: 48px 0 36px; }
+    .btn { padding: 6px 10px; }
+  }
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<header class="bar">
+  <div class="logo">Yang</div>
+  <div class="tools">
+    <button class="btn" id="bgBtn" data-i18n="bgChange">🖼 更换背景</button>
+    <button class="btn" id="bgReset" data-i18n="bgReset" hidden>恢复默认</button>
+    <button class="btn" id="langBtn">EN</button>
+  </div>
+  <input type="file" id="bgFile" accept="image/*" hidden>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="avatar">Y</div>
+    <h1><span data-i18n="hi">你好，我是</span> <span class="grad">Yang</span></h1>
+    <p class="tagline" data-i18n="tagline">设计爱好者 · AI 爱好者 · App 开发者</p>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <section id="about">
+    <h2 data-i18n="aboutTitle">关于我</h2>
+    <div class="card about">
+      <p data-i18n="about1">我喜欢把好看的设计和好用的 AI 结合起来，做一些能解决真实问题的小应用。</p>
+      <p data-i18n="about2">从一个想法，到界面草图，再到能跑起来的 App——这个过程让我着迷。</p>
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2><span data-i18n="projTitle">作品</span><small data-i18n="projSub">我做过的 App</small></h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="contact">
+    <h2 data-i18n="contactTitle">联系我</h2>
+    <div class="links">
+      <a class="btn" href="https://github.com/bei94me-coder" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn" href="mailto:you@example.com" data-i18n="email">邮箱</a>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 Yang · <span data-i18n="footer">用设计和 AI 做有趣的东西</span></footer>
+
+<script>
+/* ===== 作品列表：增删作品只需修改这里 ===== */
+const PROJECTS = [
+  {
+    icon: "📦", color: "linear-gradient(135deg,#5b5bf0,#3fb8f0)",
+    name: { zh: "盘点 Pandian", en: "Pandian" },
+    desc: { zh: "超市商品盘点 App：扫码清点、记录数量、生成差异报表。", en: "Supermarket stocktake app: scan, count, and get variance reports." },
+    tags: ["PWA", "React", "扫码"],
+    status: "dev",
+    link: "https://github.com/bei94me-coder/pandian"
+  },
+  {
+    icon: "🎨", color: "linear-gradient(135deg,#e0559c,#f0a050)",
+    name: { zh: "作品二（待填写）", en: "Project two (TBD)" },
+    desc: { zh: "在这里写一句话介绍你的作品。", en: "A one-line description of your project." },
+    tags: ["Design"],
+    status: "idea",
+    link: "#"
+  },
+  {
+    icon: "🤖", color: "linear-gradient(135deg,#20b486,#5b5bf0)",
+    name: { zh: "作品三（待填写）", en: "Project three (TBD)" },
+    desc: { zh: "比如一个用 AI 帮你完成某件事的小工具。", en: "For example, a small tool that uses AI to help with something." },
+    tags: ["AI"],
+    status: "idea",
+    link: "#"
+  }
+];
+const CHIPS = { zh: ["UI 设计", "AI 工具", "产品原型", "App 开发"], en: ["UI design", "AI tools", "Prototyping", "App dev"] };
+const STATUS = {
+  live: { zh: "已上线", en: "Live", dot: "#20b486" },
+  dev:  { zh: "开发中", en: "In progress", dot: "#f0a020" },
+  idea: { zh: "构思中", en: "Idea", dot: "#9a9aa6" }
+};
+const T = {
+  en: {
+    hi: "Hi, I'm", tagline: "Design lover · AI enthusiast · App maker",
+    aboutTitle: "About", about1: "I love combining good-looking design with useful AI to build small apps that solve real problems.",
+    about2: "Going from an idea, to sketches, to an app that actually runs — that process fascinates me.",
+    projTitle: "Projects", projSub: "Apps I've built", contactTitle: "Contact", email: "Email",
+    footer: "Making fun things with design and AI", bgChange: "🖼 Background", bgReset: "Reset"
+  }
+};
+
+/* ===== 语言切换 ===== */
+const zhText = {};
+document.querySelectorAll("[data-i18n]").forEach(el => zhText[el.dataset.i18n] = el.textContent);
+let lang = "zh";
+try { lang = localStorage.getItem("lang") || "zh"; } catch (e) {}
+
+function render() {
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const k = el.dataset.i18n;
+    el.textContent = lang === "zh" ? zhText[k] : (T.en[k] || zhText[k]);
+  });
+  document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中";
+  document.getElementById("chips").innerHTML = CHIPS[lang].map(c => `<span class="chip">${c}</span>`).join("");
+  document.getElementById("grid").innerHTML = PROJECTS.map(p => {
+    const s = STATUS[p.status] || STATUS.idea;
+    const ext = p.link && p.link !== "#" ? ' target="_blank" rel="noopener"' : "";
+    return `<a class="card proj" href="${p.link}"${ext}>
+      <div class="proj-top">
+        <div class="icon" style="background:${p.color}">${p.icon}</div>
+        <div><h3>${p.name[lang]}</h3><span class="status" style="--dot:${s.dot}">${s[lang]}</span></div>
+      </div>
+      <p>${p.desc[lang]}</p>
+      <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+    </a>`;
+  }).join("");
+}
+document.getElementById("langBtn").onclick = () => {
+  lang = lang === "zh" ? "en" : "zh";
+  try { localStorage.setItem("lang", lang); } catch (e) {}
+  render();
+};
+
+/* ===== 自定义背景照片（压缩后保存在本浏览器） ===== */
+const bg = document.getElementById("bg");
+const fileInput = document.getElementById("bgFile");
+const resetBtn = document.getElementById("bgReset");
+
+function applyBg(url) {
+  if (url) {
+    bg.style.backgroundImage = `url("${url}")`;
+    document.body.classList.add("has-bg");
+    resetBtn.hidden = false;
+  } else {
+    bg.style.backgroundImage = "";
+    document.body.classList.remove("has-bg");
+    resetBtn.hidden = true;
+  }
+}
+try { applyBg(localStorage.getItem("bgImage")); } catch (e) {}
+
+document.getElementById("bgBtn").onclick = () => fileInput.click();
+fileInput.onchange = () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const img = new Image();
+  const objUrl = URL.createObjectURL(file);
+  img.onload = () => {
+    // 缩小到最长边 1920px 并转为 JPEG，避免超出浏览器存储上限
+    const max = 1920, scale = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * scale);
+    c.height = Math.round(img.height * scale);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(objUrl);
+    let data = c.toDataURL("image/jpeg", 0.82);
+    applyBg(data);
+    try { localStorage.setItem("bgImage", data); }
+    catch (e) {
+      try { data = c.toDataURL("image/jpeg", 0.6); localStorage.setItem("bgImage", data); }
+      catch (e2) { alert(lang === "zh" ? "照片太大，本次可以显示，但刷新后不会保留。" : "Photo is too large to save; it will reset after reload."); }
+    }
+  };
+  img.onerror = () => { URL.revokeObjectURL(objUrl); alert(lang === "zh" ? "无法读取这张图片" : "Couldn't read that image"); };
+  img.src = objUrl;
+  fileInput.value = "";
+};
+resetBtn.onclick = () => {
+  try { localStorage.removeItem("bgImage"); } catch (e) {}
+  applyBg(null);
+};
+
+render();
+</script>
+</body>
+</html>
